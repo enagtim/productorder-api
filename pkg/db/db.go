@@ -1,18 +1,18 @@
 package db
 
 import (
-	"database/sql"
 	"order-api/configs"
 
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 type Db struct {
-	*sql.DB
+	*gorm.DB
 }
 
 func NewDatabase(conf *configs.Config) *Db {
-	db, err := sql.Open("postgres", conf.Db.Dsn)
+	db, err := gorm.Open(postgres.Open(conf.Db.Dsn), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}

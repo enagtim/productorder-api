@@ -30,5 +30,4 @@ func main() {
 	}
 	fmt.Println("Server start on port 4000")
 	server.ListenAndServe()
-	defer db.Close()
 }
