@@ -1,6 +1,6 @@
 package product
 
-type ProductCreate struct {
+type ProductPayload struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Price       float64 `json:"price"`

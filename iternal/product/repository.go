@@ -2,6 +2,8 @@ package product
 
 import (
 	"order-api/pkg/db"
+
+	"gorm.io/gorm/clause"
 )
 
 type ProductRepository struct {
@@ -28,4 +30,19 @@ func (repo *ProductRepository) GetById(id uint) (*Product, error) {
 		return nil, result.Error
 	}
 	return &product, nil
+}
+
+func (repo *ProductRepository) Update(p *Product) (*Product, error) {
+	result := repo.Database.DB.Clauses(clause.Returning{}).Updates(p)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return p, nil
+}
+func (repo *ProductRepository) Delete(id uint) error {
+	result := repo.Database.DB.Delete(&Product{}, id)
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
 }

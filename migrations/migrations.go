@@ -1,13 +1,13 @@
-package main
+package migrations
 
 import (
-	"order-api/configs"
 	"order-api/iternal/product"
 	"order-api/pkg/db"
 )
 
-func main() {
-	conf := configs.LoadConfig()
-	db := db.NewDatabase(conf)
-	db.AutoMigrate(&product.Product{})
+func Migrate(db *db.Db) {
+	err := db.AutoMigrate(&product.Product{})
+	if err != nil {
+		panic(err)
+	}
 }

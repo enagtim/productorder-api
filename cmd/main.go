@@ -5,20 +5,24 @@ import (
 	"net/http"
 	"order-api/configs"
 	"order-api/iternal/product"
+	"order-api/migrations"
 	"order-api/pkg/db"
 )
 
 func main() {
 
-	// Configs
+	// Configs, Database, Router
 	conf := configs.LoadConfig()
 	db := db.NewDatabase(conf)
 	router := http.NewServeMux()
 
-	// Repository
+	// Database Migrations
+	migrations.Migrate(db)
+
+	// Repositoryes
 	productRepository := product.NewProductRepository(db)
 
-	// Handler
+	// Handlers
 	product.NewProductHandler(router, &product.ProductHandler{
 		ProductRepository: productRepository,
 	})
