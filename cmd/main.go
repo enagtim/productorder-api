@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"order-api/configs"
-	"order-api/iternal/product"
+	"order-api/internal/product"
 	"order-api/migrations"
 	"order-api/pkg/db"
 )

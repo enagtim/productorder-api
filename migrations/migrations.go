@@ -1,7 +1,7 @@
 package migrations
 
 import (
-	"order-api/iternal/product"
+	"order-api/internal/product"
 	"order-api/pkg/db"
 )
 
