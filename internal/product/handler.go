@@ -1,9 +1,10 @@
 package product
 
 import (
-	"encoding/json"
 	"net/http"
 	"order-api/pkg/messages"
+	"order-api/pkg/req"
+	"order-api/pkg/res"
 	"strconv"
 
 	"gorm.io/gorm"
@@ -25,21 +26,17 @@ func NewProductHandler(router *http.ServeMux, repo *ProductHandler) {
 
 func (h *ProductHandler) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var payload ProductPayload
-		err := json.NewDecoder(r.Body).Decode(&payload)
+		body, err := req.HandleBody[ProductCreateRequest](&w, r)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		product := NewProduct(payload.Name, payload.Description, payload.Price, payload.Discount)
+		product := NewProduct(body.Name, body.Description, body.Images, body.Price, body.Discount)
 		createdProduct, err := h.ProductRepository.Create(product)
 		if err != nil {
 			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated)
-		json.NewEncoder(w).Encode(createdProduct)
+		res.ResponseJson(w, createdProduct, http.StatusCreated)
 	}
 }
 func (h *ProductHandler) GetProductById() http.HandlerFunc {
@@ -55,9 +52,7 @@ func (h *ProductHandler) GetProductById() http.HandlerFunc {
 			messages.SendJSONEError(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(product)
+		res.ResponseJson(w, product, http.StatusOK)
 	}
 }
 func (h *ProductHandler) UpdateProduct() http.HandlerFunc {
@@ -73,26 +68,23 @@ func (h *ProductHandler) UpdateProduct() http.HandlerFunc {
 			messages.SendJSONEError(w, err.Error(), http.StatusNotFound)
 			return
 		}
-		var payload ProductPayload
-		err = json.NewDecoder(r.Body).Decode(&payload)
+		body, err := req.HandleBody[ProductUpdateRequest](&w, r)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		product, err := h.ProductRepository.Update(&Product{
 			Model:       gorm.Model{ID: uint(id)},
-			Name:        payload.Name,
-			Description: payload.Description,
-			Price:       payload.Price,
-			Discount:    payload.Discount,
+			Name:        body.Name,
+			Description: body.Description,
+			Images:      body.Images,
+			Price:       body.Price,
+			Discount:    body.Discount,
 		})
 		if err != nil {
 			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(product)
+		res.ResponseJson(w, product, http.StatusOK)
 	}
 }
 func (h *ProductHandler) DeleteProduct() http.HandlerFunc {
@@ -113,7 +105,6 @@ func (h *ProductHandler) DeleteProduct() http.HandlerFunc {
 			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
+		res.ResponseJson(w, nil, http.StatusNoContent)
 	}
 }
