@@ -2,23 +2,24 @@ package product
 
 import (
 	"net/http"
+	"order-api/internal/product/dto"
+	"order-api/internal/product/service"
 	"order-api/pkg/messages"
 	"order-api/pkg/req"
 	"order-api/pkg/res"
 	"strconv"
-
-	"gorm.io/gorm"
 )
 
 type ProductHandler struct {
-	ProductRepository *ProductRepository
+	ProductService *service.ProductService
 }
 
-func NewProductHandler(router *http.ServeMux, repo *ProductHandler) {
+func NewProductHandler(router *http.ServeMux, service *service.ProductService) {
 	handler := &ProductHandler{
-		ProductRepository: repo.ProductRepository,
+		ProductService: service,
 	}
 	router.HandleFunc("POST /product/create", handler.CreateProduct())
+	router.HandleFunc("GET /products", handler.GetAllProducts())
 	router.HandleFunc("GET /product/get/{id}", handler.GetProductById())
 	router.HandleFunc("PATCH /product/update/{id}", handler.UpdateProduct())
 	router.HandleFunc("DELETE /product/delete/{id}", handler.DeleteProduct())
@@ -26,17 +27,34 @@ func NewProductHandler(router *http.ServeMux, repo *ProductHandler) {
 
 func (h *ProductHandler) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := req.HandleBody[ProductCreateRequest](&w, r)
+		body, err := req.HandleBody[dto.ProductCreateRequest](&w, r)
 		if err != nil {
 			return
 		}
-		product := NewProduct(body.Name, body.Description, body.Images, body.Price, body.Discount)
-		createdProduct, err := h.ProductRepository.Create(product)
+		product, err := h.ProductService.CreateProduct(*body)
 		if err != nil {
 			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		res.ResponseJson(w, createdProduct, http.StatusCreated)
+		res.ResponseJson(w, product, http.StatusCreated)
+	}
+}
+func (h *ProductHandler) GetAllProducts() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		limit, err := strconv.Atoi(r.URL.Query().Get("limit"))
+		if err != nil || limit <= 0 {
+			limit = 10
+		}
+		offset, err := strconv.Atoi(r.URL.Query().Get("offset"))
+		if err != nil || offset < 0 {
+			offset = 0
+		}
+		products, err := h.ProductService.GetAllProducts(limit, offset)
+		if err != nil {
+			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		res.ResponseJson(w, products, http.StatusOK)
 	}
 }
 func (h *ProductHandler) GetProductById() http.HandlerFunc {
@@ -44,10 +62,10 @@ func (h *ProductHandler) GetProductById() http.HandlerFunc {
 		idstring := r.PathValue("id")
 		id, err := strconv.Atoi(idstring)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONEError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		product, err := h.ProductRepository.GetById(uint(id))
+		product, err := h.ProductService.GetProductById(uint(id))
 		if err != nil {
 			messages.SendJSONEError(w, err.Error(), http.StatusNotFound)
 			return
@@ -60,26 +78,14 @@ func (h *ProductHandler) UpdateProduct() http.HandlerFunc {
 		idstring := r.PathValue("id")
 		id, err := strconv.Atoi(idstring)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONEError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		_, err = h.ProductRepository.GetById(uint(id))
-		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusNotFound)
-			return
-		}
-		body, err := req.HandleBody[ProductUpdateRequest](&w, r)
+		body, err := req.HandleBody[dto.ProductUpdateRequest](&w, r)
 		if err != nil {
 			return
 		}
-		product, err := h.ProductRepository.Update(&Product{
-			Model:       gorm.Model{ID: uint(id)},
-			Name:        body.Name,
-			Description: body.Description,
-			Images:      body.Images,
-			Price:       body.Price,
-			Discount:    body.Discount,
-		})
+		product, err := h.ProductService.UpdateProduct(uint(id), *body)
 		if err != nil {
 			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return
@@ -92,15 +98,10 @@ func (h *ProductHandler) DeleteProduct() http.HandlerFunc {
 		idstring := r.PathValue("id")
 		id, err := strconv.Atoi(idstring)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONEError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		_, err = h.ProductRepository.GetById(uint(id))
-		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusNotFound)
-			return
-		}
-		err = h.ProductRepository.Delete(uint(id))
+		err = h.ProductService.DeleteProduct(uint(id))
 		if err != nil {
 			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
 			return

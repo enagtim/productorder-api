@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"order-api/configs"
 	"order-api/internal/product"
+	"order-api/internal/product/repository"
+	"order-api/internal/product/service"
 	"order-api/migrations"
 	"order-api/pkg/db"
 )
@@ -20,12 +22,14 @@ func main() {
 	migrations.Migrate(db)
 
 	// Repositoryes
-	productRepository := product.NewProductRepository(db)
+	productRepository := repository.NewProductRepository(db)
+
+	// Services
+
+	service := service.NewProductService(productRepository)
 
 	// Handlers
-	product.NewProductHandler(router, &product.ProductHandler{
-		ProductRepository: productRepository,
-	})
+	product.NewProductHandler(router, service)
 
 	// Server
 	server := http.Server{
