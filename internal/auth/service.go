@@ -28,6 +28,7 @@ func (s *AuthService) CreateUser(phone string) (*user.User, error) {
 	user := &user.User{
 		Phone:     phone,
 		SessionId: sessionId,
+		Code:      3412,
 	}
 	_, err = s.UserRepository.Create(user)
 	if err != nil {

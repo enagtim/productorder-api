@@ -45,7 +45,7 @@ func (h *AuthHandler) AuthUser() http.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.NewJWT(h.Config.Auth.Secret).GenerateToken(sessionId, 3412)
+		token, err := jwt.NewJWT(h.Config.Auth.Secret).GenerateToken(sessionId)
 		if err != nil {
 			messages.SendJSONError(w, err.Error(), http.StatusInternalServerError)
 			return
