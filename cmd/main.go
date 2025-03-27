@@ -5,8 +5,6 @@ import (
 	"net/http"
 	"order-api/configs"
 	"order-api/internal/product"
-	"order-api/internal/product/repository"
-	"order-api/internal/product/service"
 	"order-api/migrations"
 	"order-api/pkg/db"
 	"order-api/pkg/middleware"
@@ -19,8 +17,8 @@ func main() {
 
 	migrations.Migrate(db)
 
-	productRepository := repository.NewProductRepository(db)
-	service := service.NewProductService(productRepository)
+	productRepository := product.NewProductRepository(db)
+	service := product.NewProductService(productRepository)
 
 	product.NewProductHandler(router, service)
 

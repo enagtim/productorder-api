@@ -1,4 +1,4 @@
-package dto
+package product
 
 type ProductCreateDto struct {
 	Name        string   `json:"name" validate:"required,max=50"`

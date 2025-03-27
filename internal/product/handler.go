@@ -2,8 +2,6 @@ package product
 
 import (
 	"net/http"
-	"order-api/internal/product/dto"
-	"order-api/internal/product/service"
 	"order-api/pkg/messages"
 	"order-api/pkg/req"
 	"order-api/pkg/res"
@@ -11,10 +9,10 @@ import (
 )
 
 type ProductHandler struct {
-	ProductService *service.ProductService
+	ProductService *ProductService
 }
 
-func NewProductHandler(router *http.ServeMux, service *service.ProductService) {
+func NewProductHandler(router *http.ServeMux, service *ProductService) {
 	handler := &ProductHandler{
 		ProductService: service,
 	}
@@ -27,7 +25,7 @@ func NewProductHandler(router *http.ServeMux, service *service.ProductService) {
 
 func (h *ProductHandler) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := req.HandleBody[dto.ProductCreateDto](&w, r)
+		body, err := req.HandleBody[ProductCreateDto](&w, r)
 		if err != nil {
 			return
 		}
@@ -81,7 +79,7 @@ func (h *ProductHandler) UpdateProduct() http.HandlerFunc {
 			messages.SendJSONError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		body, err := req.HandleBody[dto.ProductUpdateDto](&w, r)
+		body, err := req.HandleBody[ProductUpdateDto](&w, r)
 		if err != nil {
 			return
 		}
