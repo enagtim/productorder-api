@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"net/http"
 	"order-api/configs"
+	"order-api/internal/auth"
 	"order-api/internal/product"
+	"order-api/internal/user"
 	"order-api/migrations"
 	"order-api/pkg/db"
 	"order-api/pkg/middleware"
@@ -18,10 +20,16 @@ func main() {
 	migrations.Migrate(db)
 
 	productRepository := product.NewProductRepository(db)
-	service := product.NewProductService(productRepository)
+	userRepository := user.NewUserRepository(db)
 
-	product.NewProductHandler(router, service)
+	productService := product.NewProductService(productRepository)
+	authService := auth.NewAuthService(userRepository)
 
+	product.NewProductHandler(router, productService)
+	auth.NewAuthHandler(router, &auth.AuthHandlerDeps{
+		AuthService: authService,
+		Config:      conf,
+	})
 	middleware.LogInit()
 
 	server := http.Server{
