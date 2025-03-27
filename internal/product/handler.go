@@ -27,13 +27,13 @@ func NewProductHandler(router *http.ServeMux, service *service.ProductService) {
 
 func (h *ProductHandler) CreateProduct() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		body, err := req.HandleBody[dto.ProductCreateRequest](&w, r)
+		body, err := req.HandleBody[dto.ProductCreateDto](&w, r)
 		if err != nil {
 			return
 		}
 		product, err := h.ProductService.CreateProduct(*body)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		res.ResponseJson(w, product, http.StatusCreated)
@@ -51,7 +51,7 @@ func (h *ProductHandler) GetAllProducts() http.HandlerFunc {
 		}
 		products, err := h.ProductService.GetAllProducts(limit, offset)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		res.ResponseJson(w, products, http.StatusOK)
@@ -62,12 +62,12 @@ func (h *ProductHandler) GetProductById() http.HandlerFunc {
 		idstring := r.PathValue("id")
 		id, err := strconv.Atoi(idstring)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusInternalServerError)
+			messages.SendJSONError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		product, err := h.ProductService.GetProductById(uint(id))
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusNotFound)
+			messages.SendJSONError(w, err.Error(), http.StatusNotFound)
 			return
 		}
 		res.ResponseJson(w, product, http.StatusOK)
@@ -78,16 +78,16 @@ func (h *ProductHandler) UpdateProduct() http.HandlerFunc {
 		idstring := r.PathValue("id")
 		id, err := strconv.Atoi(idstring)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusInternalServerError)
+			messages.SendJSONError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		body, err := req.HandleBody[dto.ProductUpdateRequest](&w, r)
+		body, err := req.HandleBody[dto.ProductUpdateDto](&w, r)
 		if err != nil {
 			return
 		}
 		product, err := h.ProductService.UpdateProduct(uint(id), *body)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		res.ResponseJson(w, product, http.StatusOK)
@@ -98,12 +98,12 @@ func (h *ProductHandler) DeleteProduct() http.HandlerFunc {
 		idstring := r.PathValue("id")
 		id, err := strconv.Atoi(idstring)
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusInternalServerError)
+			messages.SendJSONError(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		err = h.ProductService.DeleteProduct(uint(id))
 		if err != nil {
-			messages.SendJSONEError(w, err.Error(), http.StatusBadRequest)
+			messages.SendJSONError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		res.ResponseJson(w, nil, http.StatusNoContent)

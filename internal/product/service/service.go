@@ -16,7 +16,7 @@ func NewProductService(repo *repository.ProductRepository) *ProductService {
 	return &ProductService{ProductRepository: repo}
 }
 
-func (s *ProductService) CreateProduct(req dto.ProductCreateRequest) (*model.Product, error) {
+func (s *ProductService) CreateProduct(req dto.ProductCreateDto) (*model.Product, error) {
 	product := model.NewProduct(req.Name, req.Description, req.Images, req.Price, req.Discount)
 	return s.ProductRepository.Create(product)
 }
@@ -26,7 +26,7 @@ func (s *ProductService) GetAllProducts(limit, offset int) (*[]model.Product, er
 func (s *ProductService) GetProductById(id uint) (*model.Product, error) {
 	return s.ProductRepository.GetById(id)
 }
-func (s *ProductService) UpdateProduct(id uint, req dto.ProductUpdateRequest) (*model.Product, error) {
+func (s *ProductService) UpdateProduct(id uint, req dto.ProductUpdateDto) (*model.Product, error) {
 	_, err := s.ProductRepository.GetById(id)
 	if err != nil {
 		return nil, err

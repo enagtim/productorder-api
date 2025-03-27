@@ -17,14 +17,14 @@ func main() {
 	db := db.NewDatabase(conf)
 	router := http.NewServeMux()
 
-	middleware.LogInit()
-
 	migrations.Migrate(db)
 
 	productRepository := repository.NewProductRepository(db)
 	service := service.NewProductService(productRepository)
 
 	product.NewProductHandler(router, service)
+
+	middleware.LogInit()
 
 	server := http.Server{
 		Addr:    ":4000",
