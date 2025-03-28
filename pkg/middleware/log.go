@@ -17,7 +17,7 @@ func LoggingResultRequest(next http.Handler) http.Handler {
 		}
 		next.ServeHTTP(wrapper, r)
 		logrus.WithFields(logrus.Fields{
-			"status": wrapper.StatusCode,
+			"code":   wrapper.StatusCode,
 			"method": r.Method,
 			"path":   r.URL.Path,
 		}).Info("http api-logs")

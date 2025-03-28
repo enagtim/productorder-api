@@ -23,7 +23,7 @@ func (s *AuthService) CreateUser(phone string) (*user.User, error) {
 	}
 	sessionId, err := session.GenerateSessionId()
 	if err != nil {
-		return nil, errors.New("error generation sessionId")
+		return nil, errors.New(ErrorGenerationSessionId)
 	}
 	user := &user.User{
 		Phone:     phone,
@@ -39,10 +39,10 @@ func (s *AuthService) CreateUser(phone string) (*user.User, error) {
 func (s *AuthService) VerifyUser(phone, sessionId string) (string, error) {
 	user, err := s.UserRepository.FindByPhone(phone)
 	if err != nil {
-		return "", errors.New("user not found")
+		return "", errors.New(ErrorFoundUser)
 	}
 	if user.SessionId != sessionId {
-		return "", errors.New("error user sessionId")
+		return "", errors.New(ErrorSession)
 	}
 	return user.SessionId, nil
 }

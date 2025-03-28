@@ -1,8 +1,8 @@
 package product
 
 type ProductCreateDto struct {
-	Name        string   `json:"name" validate:"required,max=50"`
-	Description string   `json:"description" validate:"required,max=200"`
+	Name        string   `json:"name" validate:"required,min=1,max=50"`
+	Description string   `json:"description" validate:"required,min=1,max=200"`
 	Images      []string `json:"images,omitempty" validate:"dive,url"`
 	Price       float64  `json:"price" validate:"required,gte=0"`
 	Discount    float64  `json:"discount" validate:"gte=0,lte=100"`
