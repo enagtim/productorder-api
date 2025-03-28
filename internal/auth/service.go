@@ -44,5 +44,5 @@ func (s *AuthService) VerifyUser(phone, sessionId string) (string, error) {
 	if user.SessionId != sessionId {
 		return "", errors.New(ErrorSession)
 	}
-	return user.SessionId, nil
+	return user.Phone, nil
 }
