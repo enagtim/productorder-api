@@ -18,12 +18,17 @@ func NewAuthService(userRepository *user.UserRepository) *AuthService {
 
 func (s *AuthService) CreateUser(phone string) (*user.User, error) {
 	existedUser, _ := s.UserRepository.FindByPhone(phone)
-	if existedUser != nil {
-		return existedUser, nil
-	}
 	sessionId, err := session.GenerateSessionId()
 	if err != nil {
 		return nil, errors.New(ErrorGenerationSessionId)
+	}
+	if existedUser != nil {
+		existedUser.SessionId = sessionId
+		_, err := s.UserRepository.Update(existedUser)
+		if err != nil {
+			return nil, err
+		}
+		return existedUser, nil
 	}
 	user := &user.User{
 		Phone:     phone,
@@ -38,7 +43,7 @@ func (s *AuthService) CreateUser(phone string) (*user.User, error) {
 }
 func (s *AuthService) VerifyUser(phone, sessionId string) (string, error) {
 	user, err := s.UserRepository.FindByPhone(phone)
-	if err != nil {
+	if err != nil || user == nil {
 		return "", errors.New(ErrorFoundUser)
 	}
 	if user.SessionId != sessionId {
