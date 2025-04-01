@@ -7,7 +7,7 @@ import (
 )
 
 type User struct {
-	*gorm.Model
+	gorm.Model
 	Phone     string      `gorm:"type:varchar(11);uniqueIndex;not null"`
 	SessionId string      `gorm:"type:varchar(50);not null"`
 	Code      uint        `gorm:"type:smallint;not null"`

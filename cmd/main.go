@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"order-api/configs"
 	"order-api/internal/auth"
+	"order-api/internal/order"
 	"order-api/internal/product"
 	"order-api/internal/user"
 	"order-api/migrations"
@@ -23,10 +24,12 @@ func main() {
 	// Repositoryes
 	productRepository := product.NewProductRepository(db)
 	userRepository := user.NewUserRepository(db)
+	orderRepository := order.NewOrderRepository(db)
 
 	// Services
 	productService := product.NewProductService(productRepository)
 	authService := auth.NewAuthService(userRepository)
+	orderService := order.NewOrderService(orderRepository)
 
 	// Handlers
 	product.NewProductHandler(router, productService)
@@ -34,7 +37,10 @@ func main() {
 		AuthService: authService,
 		Config:      conf,
 	})
-
+	order.NewProductHandler(router, order.OrderHandlerDeps{
+		OrderService: orderService,
+		Config:       conf,
+	})
 	// Server
 	server := http.Server{
 		Addr:    ":4000",
