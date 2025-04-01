@@ -16,11 +16,11 @@ func NewProductHandler(router *http.ServeMux, service *ProductService) {
 	handler := &ProductHandler{
 		ProductService: service,
 	}
-	router.HandleFunc("POST /product/create", handler.CreateProduct())
+	router.HandleFunc("POST /products", handler.CreateProduct())
 	router.HandleFunc("GET /products", handler.GetAllProducts())
-	router.HandleFunc("GET /product/get/{id}", handler.GetProductById())
-	router.HandleFunc("PATCH /product/update/{id}", handler.UpdateProduct())
-	router.HandleFunc("DELETE /product/delete/{id}", handler.DeleteProduct())
+	router.HandleFunc("GET /products/{id}", handler.GetProductById())
+	router.HandleFunc("PATCH /products/{id}", handler.UpdateProduct())
+	router.HandleFunc("DELETE /products/{id}", handler.DeleteProduct())
 }
 
 func (h *ProductHandler) CreateProduct() http.HandlerFunc {
