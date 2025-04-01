@@ -17,3 +17,19 @@ func (s *OrderService) CreateOrder(userID uint, productIDs []uint) (*Order, erro
 	}
 	return order, nil
 }
+
+func (s *OrderService) FindOrderByID(orderID, userID uint) (*Order, error) {
+	order, err := s.OrderRepository.FindOrderByID(orderID, userID)
+	if err != nil {
+		return nil, err
+	}
+	return order, nil
+}
+
+func (s *OrderService) GetAllProductsByUser(userID uint) (*[]Order, error) {
+	orders, err := s.OrderRepository.GetAllProductsByUser(userID)
+	if err != nil {
+		return nil, err
+	}
+	return orders, nil
+}

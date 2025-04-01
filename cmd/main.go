@@ -37,7 +37,7 @@ func main() {
 		AuthService: authService,
 		Config:      conf,
 	})
-	order.NewProductHandler(router, order.OrderHandlerDeps{
+	order.NewOrderHandler(router, &order.OrderHandlerDeps{
 		OrderService: orderService,
 		Config:       conf,
 	})

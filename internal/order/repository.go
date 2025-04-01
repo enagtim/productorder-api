@@ -33,3 +33,21 @@ func (repo *OrderRepository) CreateOrder(userID uint, productIDs []uint) (*Order
 	}
 	return &order, nil
 }
+
+func (repo *OrderRepository) FindOrderByID(orderID, userID uint) (*Order, error) {
+	var order Order
+	result := repo.Database.DB.Preload("Products").Where("id = ? AND user_id = ?", orderID, userID).First(&order)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &order, nil
+}
+
+func (repo *OrderRepository) GetAllProductsByUser(userID uint) (*[]Order, error) {
+	var orders []Order
+	result := repo.Database.DB.Preload("Products").Where("user_id = ?", userID).Find(&orders)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &orders, nil
+}

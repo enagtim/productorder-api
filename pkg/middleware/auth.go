@@ -12,7 +12,7 @@ import (
 type key string
 
 const (
-	ContextPhoneKey key = "ContextPhoneKey"
+	ContextUserID key = "ContextUserID"
 )
 
 func IsAuthed(next http.Handler, config *configs.Config) http.Handler {
@@ -29,9 +29,8 @@ func IsAuthed(next http.Handler, config *configs.Config) http.Handler {
 			return
 		}
 
-		ctx := context.WithValue(r.Context(), ContextPhoneKey, data.Phone)
-		req := r.WithContext(ctx)
+		ctx := context.WithValue(r.Context(), ContextUserID, data.UserID)
 
-		next.ServeHTTP(w, req)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
