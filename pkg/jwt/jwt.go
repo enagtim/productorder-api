@@ -7,16 +7,18 @@ type JWT struct {
 }
 
 type JWTData struct {
-	Phone string
+	UserID uint
+	Phone  string
 }
 
 func NewJWT(secret string) *JWT {
 	return &JWT{Secret: secret}
 }
 
-func (j *JWT) GenerateToken(phone string) (string, error) {
+func (j *JWT) GenerateToken(phone string, userId uint) (string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"phone": phone,
+		"userID": userId,
+		"phone":  phone,
 	})
 	s, err := t.SignedString([]byte(j.Secret))
 	if err != nil {
@@ -33,7 +35,16 @@ func (j *JWT) ParseToken(token string) (bool, *JWTData) {
 		return false, nil
 	}
 	phone := t.Claims.(jwt.MapClaims)["phone"]
+	userID := t.Claims.(jwt.MapClaims)["userID"]
+
+	userIDFloat64, ok := userID.(float64)
+	if !ok {
+		return false, nil
+	}
+	userIDUint := uint(userIDFloat64)
+
 	return t.Valid, &JWTData{
-		Phone: phone.(string),
+		UserID: userIDUint,
+		Phone:  phone.(string),
 	}
 }

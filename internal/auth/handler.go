@@ -38,14 +38,14 @@ func (h *AuthHandler) AuthUser() http.HandlerFunc {
 			messages.SendJSONError(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		phone, err := h.AuthService.VerifyUser(createdUser.Phone, createdUser.SessionId)
+		verifyUser, err := h.AuthService.VerifyUser(createdUser.Phone, createdUser.SessionId)
 
 		if err != nil {
 			messages.SendJSONError(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
-		token, err := jwt.NewJWT(h.Config.Auth.Secret).GenerateToken(phone)
+		token, err := jwt.NewJWT(h.Config.Auth.Secret).GenerateToken(verifyUser.Phone, verifyUser.ID)
 		if err != nil {
 			messages.SendJSONError(w, err.Error(), http.StatusInternalServerError)
 			return

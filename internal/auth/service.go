@@ -41,13 +41,13 @@ func (s *AuthService) CreateUser(phone string) (*user.User, error) {
 	}
 	return user, nil
 }
-func (s *AuthService) VerifyUser(phone, sessionId string) (string, error) {
+func (s *AuthService) VerifyUser(phone, sessionId string) (*user.User, error) {
 	user, err := s.UserRepository.FindByPhone(phone)
 	if err != nil || user == nil {
-		return "", errors.New(ErrorFoundUser)
+		return nil, errors.New(ErrorFoundUser)
 	}
 	if user.SessionId != sessionId {
-		return "", errors.New(ErrorSession)
+		return nil, errors.New(ErrorSession)
 	}
-	return user.Phone, nil
+	return user, nil
 }
