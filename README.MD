@@ -29,7 +29,7 @@ SECRET=/2+XnmJGz1j3ehIVI/5P9kl+CghrE3DcS7rnT+qar5w=
 go run main.go
 ```
 
-## API эндпоинты
+## Примеры API эндпоинтов
 
 ### Авторизация пользователя
 **POST** `/auth`
